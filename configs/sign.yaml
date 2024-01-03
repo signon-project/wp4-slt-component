@@ -1,0 +1,122 @@
+name: sign_experiment
+data:
+    data_path: ./data/
+    version: vrt-news
+    sgn: sign
+    txt: text
+    gls: gloss
+    embedding_file_spatial: path_to_the_file_with_the_spatial_embeddings
+    annotation_file: path_to_the_file_with_the_data_splits
+    train: path_to_the_file_with_the_metadata
+    dev: path_to_the_file_with_the_metadata
+    test: path_to_the_file_with_the_metadata
+    feature_size: 128
+    pose_size: 132
+    level: subword
+    txt_lowercase: true
+    max_sent_length: 400
+    random_train_subset: -1
+    random_dev_subset: -1
+    use_pose: false
+    concat_pose: false
+    use_images: false
+    scale_data: false
+    image_size: 224
+    min_f_train: 0
+    max_f_train: 79
+    pretrained_embeddings_vocab: data/pretrained_embeddings_vrt_news_vocabulary.txt
+testing:
+    recognition_beam_sizes:
+    - 8
+    translation_beam_sizes:
+    - 6
+    translation_beam_alphas:
+    - 1
+
+training:
+    reset_best_ckpt: false
+    reset_scheduler: false
+    reset_optimizer: false
+    random_seed: 42
+    model_dir: "./sign_sample_model"
+    loss_plot_file: "loss.pdf"
+    recognition_loss_weight: 0.0
+    translation_loss_weight: 1.0
+    pose_loss_weight: 0.0
+    vq_loss_weight: 0.0
+    commitment_loss_weight: 0.0
+    codebook_loss_weight: 0.0
+    eval_metric: bleu
+    optimizer: adamw
+    learning_rate: 0.0001
+    batch_size: 128
+    eval_batch_size: 128
+    num_valid_log: 5
+    epochs: 1000000000
+    early_stopping_metric: eval_metric
+    batch_type: sentence
+    translation_normalization: batch
+    eval_recognition_beam_size: 1
+    eval_translation_beam_size: 2
+    eval_translation_beam_alpha: -1
+    overwrite: true
+    shuffle: true
+    use_cuda: false
+    translation_max_output_length: 30
+    keep_last_ckpts: 1
+    batch_multiplier: 1
+    logging_freq: 100
+    validation_freq: 100
+    betas:  
+    - 0.9
+    - 0.998
+    scheduling: plateau
+    learning_rate_min: 1.0e-07
+    weight_decay: 0.001
+    patience: 20
+    decrease_factor: 0.7
+    t_max: 20
+    label_smoothing: 0
+model:
+    initializer: xavier
+    bias_initializer: zeros
+    init_gain: 1.0
+    embed_initializer: xavier
+    embed_init_gain: 1.0
+    tied_softmax: false
+    pretrained_embeddings: false
+    pretrained_embeddings_path: "data/embedding_table_vrt_news.npy"
+    pretrained_embeddings_bias_path: "data/embedding_table_bias_vrt_news.npy"
+    freeze_embeddings: false
+    encoder:
+        type: transformer
+        num_layers: 3
+        num_heads: 16
+        K: 1
+        embeddings:
+            embedding_dim: 1024
+            scale: false
+            dropout: 0.1
+            norm_type: batch
+            activation_type: softsign
+            low_rank_approximation: false
+            use_quantiser: false
+        hidden_size: 1024
+        ff_size: 4096
+        dropout: 0.1
+        pose_output_dim: 132
+    decoder:
+        type: transformer
+        num_layers: 3
+        num_heads: 16
+        embeddings:
+            embedding_dim: 1024
+            scale: false
+            dropout: 0.1
+            norm_type: batch
+            activation_type: softsign
+        hidden_size: 1024
+        ff_size: 4096
+        dropout: 0.1
+        use_adapters: false
+        
